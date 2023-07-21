@@ -1,4 +1,11 @@
-import { Body, Controller, Param, ParseIntPipe, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 import { CreateUser } from './dto/create-user';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 const grpc = require('@grpc/grpc-js');
@@ -16,10 +23,12 @@ export class UserController {
         'localhost:8083',
         grpc.credentials.createInsecure(),
       );
-      console.log(creatingUser.userId);
+      console.log(creatingUser);
       client.createUser(
         {
-          text: creatingUser.userId,
+          name: creatingUser.userName,
+          roleId: creatingUser.roleId,
+          phone: creatingUser.phone,
         },
         (err, response) => {
           console.log('Recieved from server ' + JSON.stringify(response));
@@ -30,24 +39,40 @@ export class UserController {
     }
   }
 
-  // @Post('/delete/:id')
-  // async deleteUser(@Body() createUser: CreateUser) {
-  //   try {
-  //     const client = new userPackage.Users(
-  //       'localhost:8083',
-  //       grpc.credentials.createInsecure(),
-  //     );
-  //     console.log(createUser.userId);
-  //     client.deleteUser(
-  //       {
-  //         text: createUser.userId,
-  //       },
-  //       (err, response) => {
-  //         console.log('Recieved from server ' + JSON.stringify(response));
-  //       },
-  //     );
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
+  @Post('/delete')
+  async deleteUser(@Body() creatingUser: CreateUser) {
+    try {
+      const client = new userPackage.Users(
+        'localhost:8083',
+        grpc.credentials.createInsecure(),
+      );
+      console.log(creatingUser);
+      client.deleteUser(
+        {
+          name: creatingUser.userName,
+        },
+        (err, response) => {
+          console.log('Recieved from server ' + JSON.stringify(response));
+        },
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/get-list')
+  async getList() {
+    try {
+      const client = new userPackage.Users(
+        'localhost:8083',
+        grpc.credentials.createInsecure(),
+      );
+      console.log('success');
+      client.readUsers(null, (err, response) => {
+        console.log('Recieved from server ' + JSON.stringify(response));
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 }

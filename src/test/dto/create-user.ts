@@ -4,13 +4,14 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateUser {
   @ApiPropertyOptional()
-  @Min(0, { message: 'id của người dùng không được nhỏ hơn 0.' })
-  @IsInt({ message: 'id của người dùng phải là số nguyên.' })
   @Transform(({ value }: TransformFnParams) =>
     (value = value?.trim()) ? Number(value) : undefined,
   )
-  userId?: number;
+  roleId?: number = 0;
 
   @ApiPropertyOptional()
-  userName?: string;
+  userName?: string = 'default';
+
+  @ApiPropertyOptional()
+  phone?: string = 'default';
 }
